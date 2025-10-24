@@ -1,0 +1,42 @@
+title: |-
+  Carthage fetch from internal Artifactory
+summary: |
+  Carthage fetch from internal Artifactory
+description: |
+  Carthage fetch from internal Artifactory
+website: https://github.com/fcar12/bitrise-step-carthage-fetch-from-internal-artifactory
+source_code_url: https://github.com/fcar12/bitrise-step-carthage-fetch-from-internal-artifactory
+support_url: https://github.com/fcar12/bitrise-step-carthage-fetch-from-internal-artifactory/issues
+
+type_tags:
+  - dependency
+
+toolkit:
+  bash:
+    entry_file: step.sh
+
+inputs:
+  - client_cert:
+    opts:
+      title: Client TLS certificate (PEM)
+      summary: Path or inline PEM for a client certificate to use for mTLS authentication (optional)
+      description: Path to a PEM file or inline certificate content. If provided together with `client_key`, curl will use them instead of username/password.
+      is_required: true
+  - client_key:
+    opts:
+      title: Client TLS key (PEM)
+      summary: Path or inline PEM for a client private key to use for mTLS authentication (optional)
+      description: Path to a PEM file or inline key content. If provided together with `client_cert`, curl will use them instead of username/password.
+      is_required: true
+  - cartfile_path: "Cartfile"
+    opts:
+      title: Cartfile path
+      summary: Path to the Cartfile
+      description: Path to the Cartfile that lists the Carthage dependencies.
+      is_required: false
+  - carthage_build_dir: "Carthage/Build"
+    opts:
+      title: Carthage build directory
+      summary: Path to the Carthage build directory
+      description: Path to the Carthage build directory where the fetched frameworks will be stored.
+      is_required: false
