@@ -1,9 +1,9 @@
 title: |-
   Carthage fetch from internal Artifactory
 summary: |
-  Carthage fetch from internal Artifactory
+  Add support for downloading Carthage binary dependencies from internal Artifactory using client certificate/key pairs for mTLS authentication.
 description: |
-  Carthage fetch from internal Artifactory
+  As Carthage doesn't support private certificate/key pairs, this step is used to dowloand dependencies from internal Artifactory and add them to Carthage. It reads the Cartfile for "binary" dependencies, downloads and extracts to Carthage build directory.
 website: https://github.com/fcar12/bitrise-step-carthage-fetch-from-internal-artifactory
 source_code_url: https://github.com/fcar12/bitrise-step-carthage-fetch-from-internal-artifactory
 support_url: https://github.com/fcar12/bitrise-step-carthage-fetch-from-internal-artifactory/issues
