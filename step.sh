@@ -1,13 +1,27 @@
 #!/usr/bin/env bash
-#!/usr/bin/env bash
-# fail if any commands fails
-set -e
-# debug log
-set -x
+# Print non-sensitive inputs for debugging (do NOT print secrets: password, client_cert, client_key)
+echo "--- step inputs (non-sensitive) ---"
+echo "- cartfile_build_dir: ${BITRISE_SOURCE_DIR}/$carthage_build_dir"
+echo "- cartfile_path: ${BITRISE_SOURCE_DIR}/$cartfile_path"
+echo "-----------------------------------"
+
+CARTHAGE_BUILD_DIR="$carthage_build_dir"
+CARTFILE_PATH="$cartfile_path"
+CARTFILE_RESOLVED="${CARTFILE_PATH}.resolved"
+TMP_DIR="./carthage-manual-binaries"
 
 
 if [[ "$BITRISE_CACHE_HIT" == "exact" || "$BITRISE_CACHE_HIT" == "partial" ]]; then
   echo "✅ Carthage cache found ('$BITRISE_CACHE_HIT'), skipping build of NS SDK"
+
+  #Delete all binary references from Cartfile.resolved to avoid errors and preserve cache
+  if [ -f "$CARTFILE_RESOLVED" ]; then
+    TMP_RESOLVED="${CARTFILE_RESOLVED}.tmp"
+    echo "Cleaning up ${CARTFILE_RESOLVED} to remove binary references..."
+    awk '!/^[[:space:]]*binary[[:space:]]/' "$CARTFILE_RESOLVED" > "$TMP_RESOLVED" && mv "$TMP_RESOLVED" "$CARTFILE_RESOLVED"
+    echo "Cartfile.resolved: $(cat "$CARTFILE_RESOLVED")"
+  fi
+
   exit 0
 else
   echo "⚠️ Carthage cache result: '$BITRISE_CACHE_HIT'"
@@ -60,11 +74,7 @@ if [ -n "$client_cert" ] || [ -n "$client_key" ]; then
   fi
 fi
 
-CARTHAGE_BUILD_DIR="Carthage/Build"
-CARTFILE_PATH="Cartfile"
-TMP_DIR="./carthage-manual-binaries"
 mkdir -p "$TMP_DIR" "$CARTHAGE_BUILD_DIR"
-mkdir -p "$CARTHAGE_BUILD_DIR"
  
 # Ensure .netrc is properly configured
 NETRC_PATH="$HOME/.netrc"
@@ -119,15 +129,19 @@ while IFS= read -r line; do
  
     echo "📦 Extracting $ZIP_NAME to Carthage/Build"
     unzip -q -o "$ZIP_PATH" -d "$CARTHAGE_BUILD_DIR"
- 
-    echo "Commenting out binary line in Cartfile"
+
     escaped_url=$(echo "$URL" | sed 's/[^^]/[&]/g; s/\^/\\^/g')
+    #Comment all binary references from Cartfile to avoid errors
     sed -i '' "s|^binary \"$escaped_url\".*|# &|" "$CARTFILE_PATH"
+    #Delete all binary references from Cartfile.resolved to avoid errors and preserve cache
+    sed -i '' "/^binary \"$escaped_url\".*/d" "$CARTFILE_RESOLVED"
+ 
   fi
 done < "$CARTFILE_PATH"
  
+echo "Cartfile.resolved:\n $(cat "$CARTFILE_RESOLVED")"
+
 echo "Cleaning up..."
-rm -f Cartfile.resolved
 rm -f "$TMP_DIR"/*.json "$TMP_DIR"/*.zip
  
 echo "✅ All binary frameworks downloaded and installed."
