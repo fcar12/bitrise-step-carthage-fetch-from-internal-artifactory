@@ -2,6 +2,14 @@
 
 if [[ "$BITRISE_CACHE_HIT" == "exact" || "$BITRISE_CACHE_HIT" == "partial" ]]; then
   echo "✅ Carthage cache found ('$BITRISE_CACHE_HIT'), skipping build of NS SDK"
+
+  #Delete all binary references from Cartfile.resolved to avoid errors and preserve cache
+  CARTFILE_RESOLVED="${CARTFILE_PATH}.resolved"
+  if [ -f "$CARTFILE_RESOLVED" ]; then
+    TMP_RESOLVED="${CARTFILE_RESOLVED}.tmp"
+    awk '!/^[[:space:]]*binary[[:space:]]/' "$CARTFILE_RESOLVED" > "$TMP_RESOLVED" && mv "$TMP_RESOLVED" "$CARTFILE_RESOLVED"
+  fi
+
   exit 0
 else
   echo "⚠️ Carthage cache result: '$BITRISE_CACHE_HIT'"
@@ -122,5 +130,12 @@ done < "$CARTFILE_PATH"
  
 echo "Cleaning up..."
 rm -f "$TMP_DIR"/*.json "$TMP_DIR"/*.zip
+
+#Delete all binary references from Cartfile.resolved to avoid errors and preserve cache
+CARTFILE_RESOLVED="${CARTFILE_PATH}.resolved"
+if [ -f "$CARTFILE_RESOLVED" ]; then
+  TMP_RESOLVED="${CARTFILE_RESOLVED}.tmp"
+  awk '!/^[[:space:]]*binary[[:space:]]/' "$CARTFILE_RESOLVED" > "$TMP_RESOLVED" && mv "$TMP_RESOLVED" "$CARTFILE_RESOLVED"
+fi
  
 echo "✅ All binary frameworks downloaded and installed."
