@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-#!/usr/bin/env bash
-# fail if any commands fails
-set -e
-# debug log
-set -x
-
 
 if [[ "$BITRISE_CACHE_HIT" == "exact" || "$BITRISE_CACHE_HIT" == "partial" ]]; then
   echo "✅ Carthage cache found ('$BITRISE_CACHE_HIT'), skipping build of NS SDK"
