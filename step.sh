@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+CARTHAGE_BUILD_DIR="$cartfile_build_dir"
+CARTFILE_PATH="$cartfile_path"
+TMP_DIR="./carthage-manual-binaries"
+
+
 if [[ "$BITRISE_CACHE_HIT" == "exact" || "$BITRISE_CACHE_HIT" == "partial" ]]; then
   echo "✅ Carthage cache found ('$BITRISE_CACHE_HIT'), skipping build of NS SDK"
 
@@ -62,9 +67,6 @@ if [ -n "$client_cert" ] || [ -n "$client_key" ]; then
   fi
 fi
 
-CARTHAGE_BUILD_DIR="Carthage/Build"
-CARTFILE_PATH="Cartfile"
-TMP_DIR="./carthage-manual-binaries"
 mkdir -p "$TMP_DIR" "$CARTHAGE_BUILD_DIR"
 mkdir -p "$CARTHAGE_BUILD_DIR"
  
