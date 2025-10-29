@@ -121,7 +121,6 @@ while IFS= read -r line; do
 done < "$CARTFILE_PATH"
  
 echo "Cleaning up..."
-rm -f Cartfile.resolved
 rm -f "$TMP_DIR"/*.json "$TMP_DIR"/*.zip
  
 echo "✅ All binary frameworks downloaded and installed."
